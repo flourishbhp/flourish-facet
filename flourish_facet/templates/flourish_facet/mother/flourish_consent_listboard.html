@@ -28,6 +28,9 @@
 <td style="white-space: nowrap">
     <div class="btn-group">
         {% listboard_button "Mother Locator" result.locator_wrapper.href result.locator_obj %}
+        {% if result.facet_consent_obj is None  %}
+        {% facet_contact_button result %}
+        {% endif %}
         {% listboard_button "FACET Screening" result.facet_screening_wrapper.href result.facet_screening_obj %}
         {% if result.facet_screening_obj %}
         {% listboard_button "FACET Consent" result.facet_consent_wrapper.href result.facet_consent_obj %}

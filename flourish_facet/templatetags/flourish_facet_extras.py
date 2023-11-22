@@ -1,12 +1,4 @@
-from datetime import datetime
-from urllib.parse import unquote, urlencode
-
 from django import template
-from django.conf import settings
-from django.utils.safestring import mark_safe
-from edc_base.utils import age, get_utcnow
-from edc_visit_schedule.models import SubjectScheduleHistory
-from dateutil.relativedelta import relativedelta
 
 register = template.Library()
 
@@ -81,4 +73,15 @@ def focus_group_translation_transcription_button(model_wrapper):
         add_focus_group_transcription_translation_href=model_wrapper.focus_group_interview_transcription_translation.href,
         group_identifier=model_wrapper.object.group_identifier,
         focus_group_interview_transcription_translation_model_obj=model_wrapper.focus_group_interview_transcription_translation_model_obj,
+        title=' '.join(title),)
+
+
+@register.inclusion_tag(
+    'flourish_facet/buttons/facet_contact_button.html')
+def facet_contact_button(model_wrapper):
+    title = ['Facet Contact']
+    return dict(
+        subject_identifier=model_wrapper.object.subject_identifier,
+        add_facet_contact_href=model_wrapper.facet_contact.href,
+        facet_contact_wrapper=model_wrapper.facet_contact,
         title=' '.join(title),)
