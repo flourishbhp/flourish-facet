@@ -9,9 +9,10 @@ from .facet_consent_model_wrapper import FacetConsentModelWrapper
 from .facet_mother_locator_model_wrapper import LocatorModelWrapper
 from ..models import FacetSubjectScreening, FacetConsent
 from ..utils import age_in_months
+from .facet_contact_model_wrapper_mixin import FacetCaregiverContactModelWrapperMixin
 
 
-class FlourishConsentModelWrapper(ModelWrapper):
+class FlourishConsentModelWrapper(FacetCaregiverContactModelWrapperMixin, ModelWrapper):
     model = 'flourish_caregiver.subjectconsent'
     next_url_name = settings.DASHBOARD_URL_NAMES.get(
         'facet_flourish_consent_listboard_url')
