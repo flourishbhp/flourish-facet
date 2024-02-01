@@ -122,6 +122,27 @@
             </article> <!-- card-group-item.// -->
         </div> <!-- card.// -->
     </aside>
+    <aside class="col-sm-4">
+        <div class="card">
+            <article class="card-group-item">
+                <header class="card-header">
+                    <h6 class="title">Appointment Statistics </h6>
+                </header>
+                <div class="filter-content">
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item">Completed Appointments - <span
+                                class="float-right badge badge-light round"></span>{{appointment_statistics.completed_appts}}</a>
+                        <a href="#" class="list-group-item">Incompleted Appointments - <span
+                                class="float-right badge badge-light round"></span>{{appointment_statistics.incompleted_appts}}</a>
+                        <a href="#" class="list-group-item">New Appointments - <span
+                                class="float-right badge badge-light round"></span>{{appointment_statistics.new_appts}}</a>
+                        <a href="#" class="list-group-item">Cancelled Appointments - <span
+                                class="float-right badge badge-light round"></span>{{appointment_statistics.cancelled_appts}}</a>
+                    </div> <!-- list-group .// -->
+                </div>
+            </article> <!-- card-group-item.// -->
+        </div> <!-- card.// -->
+    </aside>
 </div>
 
 {% endblock main %}

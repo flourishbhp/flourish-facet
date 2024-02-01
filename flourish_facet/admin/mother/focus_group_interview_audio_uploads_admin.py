@@ -24,8 +24,6 @@ class FocusGroupInterviewAudioUploadsAdmin(ModelAdminMixin, admin.ModelAdmin):
                 'location_other',
                 'interview_duration',
                 'interview_language',
-                'audio_file',
-                'notes',
             ]}
          ), audit_fieldset_tuple)
 

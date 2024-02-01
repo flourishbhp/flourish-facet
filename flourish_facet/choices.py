@@ -101,6 +101,7 @@ ALIVE_DEAD_UNKNOWN = (
 
 VISIT_INFO_SOURCE = [
     (PARTICIPANT, 'Clinic visit with participant'),
+    ('participant_home', 'Participant home'),
     ('other_contact',
      'Other contact with participant (for example telephone call)'),
     ('other_doctor',

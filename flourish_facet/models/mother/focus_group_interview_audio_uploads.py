@@ -51,15 +51,6 @@ class FocusGroupInterviewAudioUploads(SiteModelMixin, BaseUuidModel):
         choices=LANGUAGES_BOTH,
         max_length=15,
     )
-    audio_file = models.FileField(
-        upload_to='facet_interview/audios',
-        validators=[FileExtensionValidator(['mp3'])],
-        max_length=254,
-        null=True)
-
-    notes = models.FileField(
-        upload_to='facet_interview/notes/',
-        validators=[FileExtensionValidator(['pdf', 'doc', 'docx'])])
 
     """returns a screening identifier as a string"""
 
@@ -100,5 +91,5 @@ class FocusGroupInterviewAudioUploads(SiteModelMixin, BaseUuidModel):
 
     class Meta:
         app_label = 'flourish_facet'
-        verbose_name = 'Focus Group Interview Audio Uploads'
-        verbose_name_plural = 'Focus Group Interview Audio Uploads'
+        verbose_name = 'Focus Group Interview'
+        verbose_name_plural = 'Focus Group Interview'
