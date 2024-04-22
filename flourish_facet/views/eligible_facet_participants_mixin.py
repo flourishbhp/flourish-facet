@@ -5,9 +5,8 @@ from django.db.models import Subquery, OuterRef
 from edc_base.utils import get_utcnow
 from dateutil.relativedelta import relativedelta
 from edc_constants.constants import YES
-from django.db.models import Max, F, Min, Q, Value
+from django.db.models import Q, Count, DateField
 from django.db.models.functions import Coalesce, Cast
-from django.db.models import DateField
 
 
 class EligibleFacetParticipantsMixin:
@@ -86,7 +85,6 @@ class EligibleFacetParticipantsMixin:
         facet_screened_identifiers = self.facet_screening_cls.objects.values_list(
             'subject_identifier', flat=True)
 
-
         consent_ids = []
 
         for _, row in subject_identifiers_df.iterrows():
@@ -104,11 +102,18 @@ class EligibleFacetParticipantsMixin:
             else:
                 consent_ids.append(child_consent.subject_consent.id)
 
-        return queryset.filter(Q(subject_identifier__in=facet_screened_identifiers) | Q(id__in=consent_ids,),
-                               subject_identifier__startswith='B').annotate(
-                                   _child_dob=Subquery(self.flourish_child_consent_cls.objects.filter(
-                                       Q(child_dob__range=[dates_before, today]) | Q(
-                                           child_dob__isnull=True),
-                                       subject_consent=OuterRef('pk')).values('child_dob')[:1]),
-            child_dob=Coalesce('_child_dob', Cast(get_utcnow().date(), DateField()))).exclude(
-                subject_identifier__in=self.caregiver_offstudy_identifiers).order_by('child_dob')
+        dob_subquery = self.flourish_child_consent_cls.objects.filter(
+            Q(child_dob__range=[dates_before, today]) | Q(
+                child_dob__isnull=True),
+            subject_consent=OuterRef('pk')).values('child_dob')[:1]
+
+        unique_consents_sq = self.model_cls.objects.filter(
+            subject_identifier=OuterRef('subject_identifier')).values('id')[:1]
+
+        unique_qs = queryset.filter(id=Subquery(unique_consents_sq))
+
+        return unique_qs.filter(Q(subject_identifier__in=facet_screened_identifiers) | Q(id__in=consent_ids,),
+                                subject_identifier__startswith='B').annotate(
+                                    _child_dob=Subquery(dob_subquery),
+                                    child_dob=Coalesce('_child_dob', Cast(get_utcnow().date(), DateField()))).exclude(
+            subject_identifier__in=self.caregiver_offstudy_identifiers).order_by('child_dob')
