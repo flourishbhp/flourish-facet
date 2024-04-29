@@ -16,6 +16,7 @@ class FocusGroupInterviewTranscriptionAndTranslationAdmin(ModelAdminMixin, admin
                 'group_identifier',
                 'report_datetime',
                 'transcription_date',
+                'transcription_upload',
                 'facet_member_transcription',
                 'transcription_duration',
             ]}
