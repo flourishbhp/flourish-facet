@@ -58,7 +58,6 @@ class EligibleFacetParticipantsMixin:
             'subject_identifier', flat=True)
         return identifiers
 
-
     @property
     def caregiver_offstudy_identifiers(self):
         identifiers = self.caregiver_offstudy_cls.objects.values_list(
@@ -75,11 +74,9 @@ class EligibleFacetParticipantsMixin:
             child_subject_identifier__in=self.child_offstudy_identifiers).values_list(
             'child_subject_identifier', flat=True)
 
-
         subject_identifiers_dict = self.flourish_child_consent_cls.objects.filter(
             Q(child_dob__range=[dates_before, today]) | Q(
                 child_dob__isnull=True),
-
             subject_identifier__in=anc_subject_identifiers,
             subject_consent__future_contact=YES
         ).values('subject_consent__subject_identifier', 'subject_identifier')
@@ -90,11 +87,9 @@ class EligibleFacetParticipantsMixin:
             'subject_identifier', flat=True)
 
 
-
-
         consent_ids = []
 
-        for index, row in subject_identifiers_df.iterrows():
+        for _, row in subject_identifiers_df.iterrows():
 
             try:
 
