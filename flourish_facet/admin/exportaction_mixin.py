@@ -3,11 +3,11 @@ import uuid
 from django.apps import apps as django_apps
 from django.db.models import ManyToManyField, ForeignKey, OneToOneField, ManyToOneRel, FileField, ImageField
 from django.db.models.fields.reverse_related import OneToOneRel
-from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from flourish_export.admin_export_helper import AdminExportHelper
 import xlwt
+from flourish_caregiver.helper_classes import MaternalStatusHelper
 
 
 class ExportActionMixin(AdminExportHelper):
@@ -42,6 +42,8 @@ class ExportActionMixin(AdminExportHelper):
             subject_identifier = getattr(obj, 'subject_identifier', None)
             screening_identifier = self.screening_identifier(
                 subject_identifier=subject_identifier)
+            caregiver_hiv_status = self.caregiver_hiv_status(
+                subject_identifier=subject_identifier)
 
             # Add subject identifier and visit code
             if getattr(obj, 'facet_visit', None):
@@ -52,6 +54,7 @@ class ExportActionMixin(AdminExportHelper):
             # Update variable names for study identifiers
             data = self.update_variables(data)
             data.update(study_status=self.study_status(subject_identifier) or '')
+            data.update(hiv_status=caregiver_hiv_status,)
 
             for field in self.get_model_fields:
                 field_name = field.name
@@ -124,6 +127,13 @@ class ExportActionMixin(AdminExportHelper):
             return getattr(consent, 'screening_identifier', None)
         return None
 
+    def caregiver_hiv_status(self, subject_identifier=None):
+
+        status_helper = MaternalStatusHelper(
+            subject_identifier=subject_identifier)
+
+        return status_helper.hiv_status
+
     def consent_obj(self, subject_identifier: str):
         consent_cls = django_apps.get_model('flourish_facet.facetconsent')
         consent = consent_cls.objects.filter(
@@ -153,12 +163,10 @@ class ExportActionMixin(AdminExportHelper):
 
     @property
     def exclude_fields(self):
-        return ['created', '_state', 'hostname_created', 'hostname_modified',
+        return ['_state', 'hostname_created', 'hostname_modified',
                 'revision', 'device_created', 'device_modified', 'id', 'site_id',
-                'created_time', 'modified_time', 'report_datetime_time',
-                'registration_datetime_time', 'screening_datetime_time', 'modified',
-                'form_as_json', 'consent_model', 'randomization_datetime',
-                'registration_datetime', 'is_verified_datetime', 'first_name',
-                'last_name', 'initials', 'identity', 'facet_visit_id', 'confirm_identity',
-                'motherchildconsent', ]
-
+                'modified_time', 'report_datetime_time', 'registration_datetime_time',
+                'screening_datetime_time', 'modified', 'form_as_json', 'consent_model',
+                'randomization_datetime', 'registration_datetime', 'is_verified_datetime',
+                'first_name', 'last_name', 'initials', 'identity', 'facet_visit_id',
+                'confirm_identity', 'motherchildconsent', ]
