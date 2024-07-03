@@ -5,8 +5,6 @@
 
 {% block extra-scripts %}
 {{ block.super}}
-
-
 <style>
   .modal-scrollable {
     max-height: calc(100vh - 210px);
@@ -79,11 +77,10 @@
 
 {% endblock extra-scripts %}
 
-
 {% block listboard_panel %}
-<a id="facetscreening_add" title="add screening" class="btn btn-sm btn-default" role="button"
-    href="{{facet_screening_add_url}}" <i class="fa fa-plus fa-sm"></i> Subject Screening
-</a>
+	<a 	id="facetscreening_add" title="add screening" class="btn btn-sm btn-default" role="button"
+		href="{{facet_screening_add_url}}"> <i class="fa fa-plus fa-sm"></i> Subject Screening
+	</a>
 {% endblock listboard_panel %}
 
 
@@ -103,6 +100,15 @@
 
 
 {% block listboard_table_button_column %}
+<td>
+  <div class="btn-group">
+    {% contact_button result.contact_wrapper %}
+    <button type="button" class="btn btn-default btn-sm" onclick="callModal('{{result.subject_identifier}}')">
+      <i class="fa fa-history fa-lg"></i>
+      <i class="fa fa-files-o fa-lg"></i>
+    </button>
+  </div>
+</td>
 
 <td>
   <div class="btn-group">
@@ -173,8 +179,6 @@
 {% else %}
 <td></td>
 {% endif %}
-
-
 
 
 {% endblock listboard_table_columns %}

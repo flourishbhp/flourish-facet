@@ -49,7 +49,7 @@ class CallHistoryView(View):
         return apps.get_model(self.flourishcaregiver_label, "caregivercontact")
 
     def get_contact_entry(self, sid=None):
-        contact_entry = self.contact_model.objects.filter(subject_identifier=sid,
-                                                          contact_success='Yes').order_by('-report_datetime')
-
+        contact_entry = self.contact_model.objects.filter(
+            subject_identifier=sid,
+            contact_success='Yes').order_by('-report_datetime')
         return contact_entry

@@ -58,7 +58,6 @@ class EligibleFacetParticipantsMixin:
             'subject_identifier', flat=True)
         return identifiers
 
-
     @property
     def caregiver_offstudy_identifiers(self):
         identifiers = self.caregiver_offstudy_cls.objects.values_list(
@@ -74,7 +73,6 @@ class EligibleFacetParticipantsMixin:
         anc_subject_identifiers = self.antenatal_enrollment_cls.objects.exclude(
             child_subject_identifier__in=self.child_offstudy_identifiers).values_list(
             'child_subject_identifier', flat=True)
-
 
         subject_identifiers_dict = self.flourish_child_consent_cls.objects.filter(
             Q(child_dob__range=[dates_before, today]) | Q(
@@ -113,4 +111,4 @@ class EligibleFacetParticipantsMixin:
                     child_dob__isnull=True),
                 subject_consent=OuterRef('pk')).values('child_dob')[:1]),
             child_dob=Coalesce('_child_dob', Cast(get_utcnow().date(), DateField()))).exclude(
-            subject_identifier__in=self.caregiver_offstudy_identifiers).order_by('child_dob')
+                subject_identifier__in=self.caregiver_offstudy_identifiers).order_by('child_dob')

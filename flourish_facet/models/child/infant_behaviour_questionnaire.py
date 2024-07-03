@@ -321,7 +321,7 @@ class InfantBehaviourQuestionnaire(CrfModelMixin):
 
     comment = models.TextField(
         null=True,
-        blank = True)
+        blank=True)
 
     @property
     def get_child_age(self):
