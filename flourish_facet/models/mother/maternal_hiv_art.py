@@ -35,7 +35,7 @@ class MaternalHivArt(CrfModelMixin):
     drug_combination_before_other = OtherCharField()
 
     art_start_date = models.DateField(
-        verbose_name='When did the you start taking antiretroviral drugs?',
+        verbose_name='When did you start taking antiretroviral drugs?',
         null=True,
         blank=True,
         validators=[date_not_future,]
