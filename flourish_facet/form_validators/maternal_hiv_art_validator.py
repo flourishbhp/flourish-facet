@@ -20,15 +20,13 @@ class MaternalHivArtFormValidator(FormValidator):
         self.validate_against_hiv_test_date()
 
     def hiv_positive_validations(self):
-        hiv_test_date_fields = (
-            'drug_combination_before',
-            'art_received_preg',)
+    
 
-        for field in hiv_test_date_fields:
-            self.required_if(
-                YES,
-                field='art_received',
-                field_required=field)
+
+        self.required_if(
+            YES,
+            field='art_received',
+            field_required='drug_combination_before')
 
         self.validate_other_specify(field='drug_combination_before',
                                     other_specify_field='drug_combination_before_other')
