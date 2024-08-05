@@ -1,9 +1,9 @@
 from django.db import models
 from ..model_mixins import CrfModelMixin
-from ...choices import AGE_BREASTFEEDING_ENDED, POS_NEG_IND, YES_NO_DNK, REASON_CHILD_NOT_TESTED
-from ...action_items import FACET_CHILD_OFFSTUDY_ACTION
+from ...choices import (AGE_BREASTFEEDING_ENDED, POS_NEG_IND, REASON_RESULTS_UNAVAILABLE, TEST_VENUE, YES_NO_DNK,
+                        REASON_CHILD_NOT_TESTED)
 from edc_base.model_fields import OtherCharField
-from edc_action_item.model_mixins import ActionModelMixin
+from edc_constants.choices import YES_NO
 
 
 class ChildHivTesting(CrfModelMixin):
@@ -29,7 +29,13 @@ class ChildHivTesting(CrfModelMixin):
         verbose_name='Was your child tested for HIV at their 6-week visit?',
         max_length=15,
         choices=YES_NO_DNK,
-        help_text='If no, go to question 8 , If yes go to question 7'
+        help_text='If no, go to question 12 , If yes go to question 7'
+    )
+    result_6_weeks_in = models.CharField(
+        verbose_name='Have you received the results of this test?',
+        max_length=15,
+        choices=YES_NO,
+        help_text='If no, go to question  9, If yes go to question 8'
     )
 
     hiv_result_6_weeks = models.CharField(
@@ -37,7 +43,24 @@ class ChildHivTesting(CrfModelMixin):
         choices=POS_NEG_IND,
         blank=True,
         max_length=15,
-        help_text='If Positive, take off-study , If Negative go to question 10')
+        help_text='If Positive, take off-study , If Negative go to question 14')
+
+    reason_results_unavailable = models.CharField(
+        max_length=40,
+        choices=REASON_RESULTS_UNAVAILABLE,
+        verbose_name="If you have never received the HIV test results for 6 weeks,why?",
+        null=True,
+        blank=True
+    )
+    reason_results_unavailable_other = OtherCharField()
+
+    preferred_test_venue = models.CharField(
+        max_length=35,
+        choices=TEST_VENUE,
+        verbose_name="Where would you like to test your child at?",
+        null=True,
+        blank=True
+    )
 
     reason_not_tested_6_weeks = models.CharField(
         max_length=35,
@@ -52,7 +75,7 @@ class ChildHivTesting(CrfModelMixin):
         verbose_name='Have you ever breastfed your child?',
         max_length=15,
         choices=YES_NO_DNK,
-        help_text='If no, go to question 12 , If yes go to question 11'
+        help_text='If no, go to question 16 , If yes go to question 15'
     )
 
     child_breastfeeding = models.CharField(

@@ -180,6 +180,27 @@ REASON_CHILD_NOT_TESTED = [
     (OTHER, 'Other (Specify)'),
 ]
 
+REASON_RESULTS_UNAVAILABLE = [
+    ('results_pending',
+     'Results still pending'),
+    ('results_misplaced_clinic',
+     'Clinic misplaced the results'),
+    ('results_misplaced_parent',
+     'Parent misplaced the results'),
+    ('results_never_collect',
+     'Results never Collected'),
+    (OTHER, 'Other (Specify)'),
+]
+
+TEST_VENUE = [
+    ('local_clinic',
+     'Local clinic'),
+    ('facet_study',
+     'FACET study'),
+    ('test_denied',
+     'No ,I do not want to test my child'),
+]
+
 LOCATION_INTERVIEW = [
     ('facet_clinic_site', 'Facet clinic site'),
     ('ra_office', 'RA Office'),

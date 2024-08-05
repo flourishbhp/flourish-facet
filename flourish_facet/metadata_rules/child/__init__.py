@@ -1,1 +1,2 @@
 from .facet_child_visit_rules import ChildVisitRuleGroup
+from .child_hiv_testing_rules import ChildHivTestingRuleGroup
