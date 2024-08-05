@@ -24,7 +24,7 @@ class ChildHivPendingResultsForm(FormValidatorMixin, SiteModelFormMixin, forms.M
             child_hiv_testing_obj = self.child_hiv_testing_model_cls.objects.filter(
                 facet_visit__subject_identifier=subject_identifier).first()
         if child_hiv_testing_obj:
-            if child_hiv_testing_obj.preferred_test_venue:
+            if child_hiv_testing_obj.preferred_test_venue == 'facet_study':
                 self.initial['test_venue'] = child_hiv_testing_obj.preferred_test_venue
 
     class Meta:
