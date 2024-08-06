@@ -37,22 +37,5 @@ class ChildHivTestingFormValidator(FormValidator):
         self.validate_other_specify(
             field='reason_results_unavailable', other_specify_field='reason_results_unavailable_other')
 
-        self.required_if(
-            OTHER,
-            field='reason_not_tested',
-            field_required='reason_not_tested_other',
-        )
-
-        self.required_if(
-            OTHER,
-            field='reason_results_unavailable',
-            field_required='reason_results_unavailable_other',
-        )
-
         self.validate_other_specify(
             field='reason_not_tested_6_weeks', other_specify_field='reason_not_tested_6_weeks_other')
-        self.required_if(
-            OTHER,
-            field='reason_not_tested_6_weeks',
-            field_required='reason_not_tested_6_weeks_other',
-        )
