@@ -25,12 +25,9 @@ class InfantBehaviourQuestionnaireFormValidator(FormValidator):
         self.subject_identifier = self.cleaned_data.get(
             'facet_visit').appointment.subject_identifier
 
-        maternal_identifier = caregiver_subject_identifier(
-            subject_identifier=self.subject_identifier)
-
         try:
             maternal_lab_del = self.maternal_del_cls.objects.get(
-                subject_identifier=maternal_identifier)
+                child_subject_identifier=self.subject_identifier)
         except self.maternal_del_cls.DoesNotExist:
             raise ValidationError(
                 'Cannot find maternal labour and delivery '
