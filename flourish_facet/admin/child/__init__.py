@@ -5,3 +5,4 @@ from .child_socio_demographic_admin import ChildSocioDemographicAdmin
 from .facet_child_offschedule_admin import FacetChildOffScheduleAdmin
 from .infant_behaviour_questionnaire_admin import InfantBehaviourQuestionnaireAdmin
 from .facet_child_medical_history_admin import FacetChildMedicalHistoryAdmin
+from .child_hiv_pending_resullts_admin import ChildHivPendingResultsAdmin
