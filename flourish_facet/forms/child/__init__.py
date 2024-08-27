@@ -5,3 +5,4 @@ from .child_neurodevelopment_screening_form import ChildNeurodevelopmentScreenin
 from .child_socio_demographic_form import ChildSocioDemographicForm
 from .infant_behaviour_questionnaire_form import InfantBehaviourQuestionnaireForm
 from .facet_child_medical_history_form import FacetChildMedicalHistoryForm
+from .child_hiv_pending_results_form import ChildHivPendingResultsForm
