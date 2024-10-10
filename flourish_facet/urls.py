@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
+from flourish_facet.views.home_view_export import HomeViewExport
 from flourish_facet.views.interview_forms.listboard_view import GroupInterviewListBoardView
 from .admin_site import flourish_facet_admin
 from django.urls import path, re_path
@@ -61,6 +62,7 @@ urlpatterns = [
     path('administration/', AdministrationView.as_view(),
          name='administration_url'),
     path('home/', HomeView.as_view(), name='home_url'),
+    path('facet_export/', HomeViewExport.as_view(), name='facet_export_url'),
     path('', RedirectView.as_view(url='admin/'), name='admin_url'),
     re_path(r'^events/'
             f'(?P<subject_identifier>{subject_identifier})/',

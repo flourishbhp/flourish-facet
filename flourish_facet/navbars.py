@@ -60,6 +60,11 @@ flourish_facet.append_item(
             'facet_export_listboard_url'],
         no_url_namespace=no_url_namespace))
 
+flourish_facet.append_item(
+    NavbarItem(name='flourish_facet_export',
+               label='Facet Exports',
+               fa_icon='fa fa-database',
+               url_name='flourish_facet:facet_export_url'))
 
 flourish_facet.append_item(
     NavbarItem(name='flourish_facet_admin',
