@@ -1,7 +1,6 @@
 import datetime
 import uuid
 from django.apps import apps as django_apps
-from django.db.models import ManyToManyField, ForeignKey, OneToOneField, ManyToOneRel, FileField, ImageField
 from django.db.models.fields.reverse_related import OneToOneRel
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -37,8 +36,8 @@ class ExportActionMixin(AdminExportHelper):
         records = []
 
         for obj in queryset:
-            data = obj.__dict__.copy()
-
+            data = self.process_object_fields(obj)
+            
             subject_identifier = getattr(obj, 'subject_identifier', None)
             screening_identifier = self.screening_identifier(
                 subject_identifier=subject_identifier)
@@ -56,28 +55,6 @@ class ExportActionMixin(AdminExportHelper):
             data.update(study_status=self.study_status(subject_identifier) or '')
             data.update(hiv_status=caregiver_hiv_status,)
 
-            for field in self.get_model_fields:
-                field_name = field.name
-                if (field_name == 'consent_version') and self.is_visit(obj):
-                    data.update({f'{field_name}': '1'})
-                    continue
-                if isinstance(field, (ForeignKey, OneToOneField, OneToOneRel,)):
-                    continue
-                if isinstance(field, (FileField, ImageField,)):
-                    file_obj = getattr(obj, field_name, '')
-                    data.update({f'{field_name}': getattr(file_obj, 'name', '')})
-                    continue
-                if isinstance(field, ManyToManyField):
-                    data.update(self.m2m_data_dict(obj, field))
-                    continue
-                if not (self.is_consent(obj) or self.is_visit(obj)) and isinstance(field, ManyToOneRel):
-                    data.update(self.inline_data_dict(obj, field))
-                    continue
-
-            # Exclude identifying values
-            data = self.remove_exclude_fields(data)
-            # Correct date formats
-            data = self.fix_date_formats(data)
             records.append(data)
         response = self.write_to_csv(records)
         return response
@@ -142,14 +119,6 @@ class ExportActionMixin(AdminExportHelper):
         if consent.exists():
             return consent.last()
         return None
-
-    def is_consent(self, obj):
-        consent_cls = django_apps.get_model('flourish_facet.facetconsent')
-        return isinstance(obj, consent_cls)
-
-    def is_visit(self, obj):
-        visit_cls = django_apps.get_model('flourish_facet.facetvisit')
-        return isinstance(obj, visit_cls)
 
     @property
     def get_model_fields(self):
