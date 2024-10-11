@@ -24,5 +24,6 @@ class Medications(ListModelMixin, BaseUuidModel):
 class GeneralSymptoms(ListModelMixin, BaseUuidModel):
     pass
 
+
 class FgfSubjectIdentifiers(ListModelMixin, BaseUuidModel):
     pass

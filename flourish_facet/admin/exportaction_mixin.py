@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from flourish_export.admin_export_helper import AdminExportHelper
 import xlwt
 from flourish_caregiver.helper_classes import MaternalStatusHelper
+from django.db.models import ManyToManyField, ForeignKey, OneToOneField, ManyToOneRel, FileField, ImageField
 
 
 class ExportActionMixin(AdminExportHelper):
@@ -37,23 +38,13 @@ class ExportActionMixin(AdminExportHelper):
 
         for obj in queryset:
             data = self.process_object_fields(obj)
-            
+
             subject_identifier = getattr(obj, 'subject_identifier', None)
             screening_identifier = self.screening_identifier(
                 subject_identifier=subject_identifier)
-            caregiver_hiv_status = self.caregiver_hiv_status(
-                subject_identifier=subject_identifier)
-
-            # Add subject identifier and visit code
-            if getattr(obj, 'facet_visit', None):
-                data.update(
-                    subject_identifier=subject_identifier,
-                    visit_code=obj.visit_code)
 
             # Update variable names for study identifiers
             data = self.update_variables(data)
-            data.update(study_status=self.study_status(subject_identifier) or '')
-            data.update(hiv_status=caregiver_hiv_status,)
 
             records.append(data)
         response = self.write_to_csv(records)
@@ -120,6 +111,14 @@ class ExportActionMixin(AdminExportHelper):
             return consent.last()
         return None
 
+    def is_consent(self, obj):
+        consent_cls = django_apps.get_model('flourish_facet.facetconsent')
+        return isinstance(obj, consent_cls)
+
+    def is_visit(self, obj):
+        visit_cls = django_apps.get_model('flourish_facet.facetvisit')
+        return isinstance(obj, visit_cls)
+
     @property
     def get_model_fields(self):
         return [field for field in self.model._meta.get_fields()
@@ -138,4 +137,61 @@ class ExportActionMixin(AdminExportHelper):
                 'screening_datetime_time', 'modified', 'form_as_json', 'consent_model',
                 'randomization_datetime', 'registration_datetime', 'is_verified_datetime',
                 'first_name', 'last_name', 'initials', 'identity', 'facet_visit_id',
-                'confirm_identity', 'motherchildconsent', ]
+                'confirm_identity', 'motherchildconsent', 'slug']
+
+    def process_object_fields(self, obj):
+        data = obj.__dict__.copy()
+
+        subject_identifier = getattr(obj, 'subject_identifier', None)
+        caregiver_hiv_status = self.caregiver_hiv_status(
+            subject_identifier=subject_identifier)
+
+        if getattr(obj, 'facet_visit', None):
+            data.update(subject_identifier=subject_identifier,
+                        visit_code=obj.visit_code)
+
+        for field in self.get_model_fields:
+
+            field_name = field.name
+            if (field_name == 'consent_version') and self.is_visit(obj):
+                data.update({f'{field_name}': '1'})
+                continue
+            if isinstance(field, (ForeignKey, OneToOneField, OneToOneRel)):
+                continue
+            if isinstance(field, (FileField, ImageField)):
+                file_obj = getattr(obj, field_name, '')
+                data.update({f'{field_name}': getattr(file_obj, 'name', '')})
+                continue
+            if isinstance(field, ManyToManyField):
+                data.update(self.m2m_data_dict(obj, field))
+                continue
+            if not (self.is_consent(obj) or self.is_visit(obj)) and isinstance(field, ManyToOneRel):
+                data.update(self.inline_data_dict(obj, field))
+                continue
+
+        data.update(study_status=self.study_status(
+            subject_identifier) or '')
+        data.update(hiv_status=caregiver_hiv_status,)
+        # Exclude identifying values
+        data = self.remove_exclude_fields(data)
+        # Correct date formats
+        data = self.fix_date_formats(data)
+
+        return data
+
+    def get_flat_model_data(self, model):
+        data = []
+        model_name = model.__name__.lower()
+        # Temporarily set self.model to the current model
+        self.model = model
+        try:
+            for obj in model.objects.all():
+                record = self.process_object_fields(obj)
+                prefixed_record = {
+                    f"{model_name}_{key}": value for key, value in record.items()}
+                data.append(prefixed_record)
+        finally:
+            # Reset self.model after processing
+            self.model = None
+
+        return data

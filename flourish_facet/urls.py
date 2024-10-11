@@ -14,15 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import re_path
+from django.urls import path, re_path, include
 from flourish_facet.views.home_view_export import HomeViewExport
 from flourish_facet.views.interview_forms.listboard_view import GroupInterviewListBoardView
-from .admin_site import flourish_facet_admin
-from django.apps import apps as django_apps
 from edc_dashboard import UrlConfig
 from django.views.generic.base import RedirectView
+from .admin_site import flourish_facet_admin
+from django.apps import apps as django_apps
 from django.contrib import admin
-from django.urls import include, path
 from django.views.generic.base import RedirectView
 from edc_action_item.admin_site import edc_action_item_admin
 from edc_appointment.admin_site import edc_appointment_admin

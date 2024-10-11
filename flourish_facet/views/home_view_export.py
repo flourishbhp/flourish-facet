@@ -8,9 +8,10 @@ from flourish_export.views.export_methods_view_mixin import ExportMethodsViewMix
 from flourish_export.views.listboard_view_mixin import ListBoardViewMixin
 from flourish_facet.utils.facet_export_facade import FacetExportFacade
 
+
 class HomeViewExport(ExportMethodsViewMixin,
-               ListBoardViewMixin, EdcBaseViewMixin,
-               NavbarViewMixin, TemplateView):
+                     ListBoardViewMixin, EdcBaseViewMixin,
+                     NavbarViewMixin, TemplateView):
 
     template_name = 'flourish_facet/home_export.html'
     navbar_name = 'flourish_facet'
@@ -22,7 +23,7 @@ class HomeViewExport(ExportMethodsViewMixin,
         context = super().get_context_data(**kwargs)
 
         download = self.request.GET.get('download')
-        
+
         facet_facade = FacetExportFacade(self.request)
 
         if download == '6':

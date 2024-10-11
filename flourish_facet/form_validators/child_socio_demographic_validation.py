@@ -67,16 +67,16 @@ class ChildSocioDemographicFormValidator(FormValidator):
         if (attend_school == YES and
                 self.cleaned_data.get('education_level') == 'no_schooling'):
             msg = {'education_level':
-                       'This child is said to be attending school, Please specify '
-                       'education level.'}
+                   'This child is said to be attending school, Please specify '
+                   'education level.'}
             self._errors.update(msg)
             raise ValidationError(msg)
 
         if (attend_school == NO and
                 self.cleaned_data.get('education_level') != 'no_schooling'):
             msg = {'education_level':
-                       'This child is not attending school, Please specify '
-                       'education level as `No schooling` to indicate this.'}
+                   'This child is not attending school, Please specify '
+                   'education level as `No schooling` to indicate this.'}
             self._errors.update(msg)
             raise ValidationError(msg)
 
