@@ -184,18 +184,17 @@ class HomeView(EdcBaseViewMixin, NavbarViewMixin, TemplateView, EligibleFacetPar
     def incomplete_enrol_hiv_statistics(self):
         """Inprogress visit HIV statistics"""
         return self.get_hiv_statistics(appt_status=IN_PROGRESS_APPT)
-    
+
     @property
     def complete_appointment_count(self):
         facet_subject_identifiers = self.facet_consent_cls.objects.values_list(
             'subject_identifier', flat=True)
-        
-        appt_count =  self.facet_appointment_cls.objects.filter(
-            appt_status = COMPLETE_APPT,
-            subject_identifier__in = facet_subject_identifiers).count()
-        
-        return appt_count
 
+        appt_count = self.facet_appointment_cls.objects.filter(
+            appt_status=COMPLETE_APPT,
+            subject_identifier__in=facet_subject_identifiers).count()
+
+        return appt_count
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

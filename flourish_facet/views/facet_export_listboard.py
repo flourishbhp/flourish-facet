@@ -57,4 +57,4 @@ class FacetExportListBoardView(NavbarViewMixin, EdcBaseViewMixin, ListBoardViewM
         return context
 
     def get_queryset(self):
-        return super().get_queryset().filter(study='flourish_facet',description='Flourish Facet Export(s)')
+        return super().get_queryset().filter(study='flourish_facet', description='Flourish Facet Export(s)')
