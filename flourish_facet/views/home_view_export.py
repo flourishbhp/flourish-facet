@@ -23,14 +23,15 @@ class HomeViewExport(ExportMethodsViewMixin,
         context = super().get_context_data(**kwargs)
 
         download = self.request.GET.get('download')
+        description = 'Flourish Facet Flat Export(s)'
 
         facet_facade = FacetExportFacade(self.request)
 
         if download == '6':
-            facet_facade.generate_export(flat_export=True)
+            facet_facade.generate_export(description,flat_export=True)
 
         facet_exports = ExportFile.objects.filter(
-            description='Flourish Facet Flat Export(s)').order_by('-uploaded_at')[:10]
+            description=description).order_by('-uploaded_at')[:10]
         context.update(
             facet_exports=facet_exports,
         )
