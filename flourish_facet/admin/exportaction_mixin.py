@@ -47,7 +47,7 @@ class ExportActionMixin(AdminExportHelper):
             data = self.update_variables(data)
 
             records.append(data)
-        response = self.write_to_csv(records)
+        response = self.write_to_csv(records=records)
         return response
 
     export_as_csv.short_description = _(
@@ -81,9 +81,17 @@ class ExportActionMixin(AdminExportHelper):
             top_num += 1
             self.inline_header = True
 
-    def get_export_filename(self):
+    def get_export_filename(self, app_label=None, export_type=None):
         date_str = datetime.datetime.now().strftime('%Y-%m-%d')
-        filename = "%s-%s" % (self.model.__name__, date_str)
+        if hasattr(self, 'model') and self.model is not None:
+            filename = "%s-%s" % (self.model.__name__, date_str)
+        else:
+            # If self.model doesn't exist, use app_label and export_type
+            if app_label and export_type:
+                filename = "%s_%s_%s" % (app_label, export_type, date_str)
+            else:
+                raise ValueError(
+                    "Either self.model must exist, or app_label and export_type must be provided.")
         return filename
 
     def screening_identifier(self, subject_identifier=None):
