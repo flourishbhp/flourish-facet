@@ -116,15 +116,14 @@ class ExportActionMixin(AdminExportHelper):
         visit_cls = django_apps.get_model('flourish_facet.facetvisit')
         return isinstance(obj, visit_cls)
     
-    def is_appointment(self, obj):
-        appointment_cls = django_apps.get_model('flourish_facet.appointment')
-        return isinstance(obj, appointment_cls)
-    def is_facet_clinician_notes(self, obj):
-        facet_clinician_cls = django_apps.get_model('flourish_facet.facetcliniciannotes')
-        return isinstance(obj, facet_clinician_cls)
-    def is_clinician_notes_image(self, obj):
-        clinician_cls= django_apps.get_model('flourish_facet.cliniciannotesimage')
-        return isinstance(obj, clinician_cls)
+    def is_excluded_model(self,model):
+        model_classes = [
+            django_apps.get_model('flourish_facet.facetvisit'),
+            django_apps.get_model('flourish_facet.appointment'),
+            django_apps.get_model('flourish_facet.facetcliniciannotes'),
+            django_apps.get_model('flourish_facet.cliniciannotesimage'),]
+        
+        return any(issubclass(model, cls) for cls in model_classes)
 
     @property
     def get_model_fields(self):
@@ -189,13 +188,12 @@ class ExportActionMixin(AdminExportHelper):
     def get_flat_model_data(self, model):
         data = []
         model_name = model.__name__.lower()
+        if self.is_excluded_model(model):
+            return data
         # Temporarily set self.model to the current model
         self.model = model
         try:
             for obj in model.objects.all():
-                result_dict = self.check_all_methods(obj)
-                if any(result for result in result_dict.values()):
-                    continue
                 relation_identifier = {}
                 if isinstance(obj, MotherChildConsent):
                     facet_consent = getattr(obj, 'facet_consent', None)
@@ -217,20 +215,3 @@ class ExportActionMixin(AdminExportHelper):
             self.model = None
 
         return data
-    
-    def check_all_methods(self, obj):
-        # List of method names to check
-        method_names = ['is_visit', 'is_appointment', 'is_facet_clinician_notes', 'is_clinician_notes_image']
-
-        # Dictionary to store results
-        results = {}
-
-        for method_name in method_names:
-            # Use getattr to dynamically call the method
-            method = getattr(self, method_name, None)
-            
-            if method and callable(method):
-                # Call the method with obj and store the result
-                results[method_name] = method(obj)
-        
-        return results
