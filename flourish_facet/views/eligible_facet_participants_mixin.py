@@ -94,7 +94,7 @@ class EligibleFacetParticipantsMixin:
             try:
 
                 child_consent = self.flourish_child_consent_cls.objects.filter(
-                    Q(subject_identifier=row['subject_identifier']) | 
+                    Q(subject_identifier=row['subject_identifier']) |
                     Q(subject_consent__subject_identifier__in=facet_screened_identifiers),
                     subject_consent__subject_identifier=row['subject_consent__subject_identifier'],
                 ).latest('version')

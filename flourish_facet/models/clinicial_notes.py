@@ -10,7 +10,6 @@ from .model_mixins import CrfModelMixin
 class FacetClinicianNotes(VerificationFieldsMixin, CrfModelMixin):
     crf_date_validator_cls = None
 
-
     class Meta(CrfModelMixin.Meta):
         app_label = 'flourish_facet'
         verbose_name = 'Clinician Notes'

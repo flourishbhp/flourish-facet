@@ -11,7 +11,6 @@ class FacetMotherConsentListboardView(EdcBaseViewMixin,
                                       ListboardFilterViewMixin,
                                       ListboardView):
 
-
     listboard_template = 'facet_mother_listboard_template'
     listboard_url = 'facet_mother_listboard_url'
     listboard_panel_style = 'success'

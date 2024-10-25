@@ -5,8 +5,8 @@ from edc_appointment.form_validators import AppointmentFormValidator
 from ..models import Appointment
 
 
-class FacetAppointmentForm(SiteModelFormMixin, FormValidatorMixin, 
-                           AppointmentFormValidator,forms.ModelForm):
+class FacetAppointmentForm(SiteModelFormMixin, FormValidatorMixin,
+                           AppointmentFormValidator, forms.ModelForm):
 
     class Meta:
         model = Appointment

@@ -14,18 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
+from flourish_facet.views.home_view_export import HomeViewExport
 from flourish_facet.views.interview_forms.listboard_view import GroupInterviewListBoardView
-from .admin_site import flourish_facet_admin
-from django.urls import path, re_path
-from django.apps import apps as django_apps
 from edc_dashboard import UrlConfig
 from django.views.generic.base import RedirectView
 from django.apps import apps as django_apps
-from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.views import LogoutView
-from django.urls import include, path
 from django.views.generic.base import RedirectView
 from edc_action_item.admin_site import edc_action_item_admin
 from edc_appointment.admin_site import edc_appointment_admin
@@ -61,6 +56,7 @@ urlpatterns = [
     path('administration/', AdministrationView.as_view(),
          name='administration_url'),
     path('home/', HomeView.as_view(), name='home_url'),
+    path('facet_export/', HomeViewExport.as_view(), name='facet_export_url'),
     path('', RedirectView.as_view(url='admin/'), name='admin_url'),
     re_path(r'^events/'
             f'(?P<subject_identifier>{subject_identifier})/',
