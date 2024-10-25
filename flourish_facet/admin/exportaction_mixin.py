@@ -192,26 +192,25 @@ class ExportActionMixin(AdminExportHelper):
             return data
         # Temporarily set self.model to the current model
         self.model = model
-        try:
-            for obj in model.objects.all():
-                relation_identifier = {}
-                if isinstance(obj, MotherChildConsent):
-                    facet_consent = getattr(obj, 'facet_consent', None)
-                    mother_subject_identifier = getattr(facet_consent, 'subject_identifier', None)
-                    relation_identifier = {"mother_identifier": mother_subject_identifier}
-                
-                elif isinstance(obj, FacetConsent):
-                    mother_child_consent = obj.motherchildconsent_set.first()
-                    child_subject_identifier = getattr(mother_child_consent, 'subject_identifier', None) if mother_child_consent else None
-                    relation_identifier = {"child_identifier": child_subject_identifier}
+        for obj in model.objects.all():
+            relation_identifier = {}
+            if isinstance(obj, MotherChildConsent):
+                facet_consent = getattr(obj, 'facet_consent', None)
+                mother_subject_identifier = getattr(facet_consent, 'subject_identifier', None)
+                relation_identifier = {"mother_identifier": mother_subject_identifier}
             
-                record = self.process_object_fields(obj)
-                prefixed_record = {
-                    f"{model_name}_{key}": value for key, value in record.items()}
-                prefixed_record.update(relation_identifier)
-                data.append(prefixed_record)
-        finally:
+            elif isinstance(obj, FacetConsent):
+                mother_child_consent = obj.motherchildconsent_set.first()
+                child_subject_identifier = getattr(mother_child_consent, 'subject_identifier', None) if mother_child_consent else None
+                relation_identifier = {"child_identifier": child_subject_identifier}
+        
+            record = self.process_object_fields(obj)
+            prefixed_record = {
+                f"{model_name}_{key}": value for key, value in record.items()}
+            prefixed_record.update(relation_identifier)
+            data.append(prefixed_record)
+       
             # Reset self.model after processing
-            self.model = None
+        self.model = None
 
         return data
