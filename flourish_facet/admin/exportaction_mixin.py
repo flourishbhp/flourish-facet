@@ -1,13 +1,15 @@
 import datetime
 import uuid
 from django.apps import apps as django_apps
-from django.db.models import ManyToManyField, ForeignKey, OneToOneField, ManyToOneRel, FileField, ImageField
 from django.db.models.fields.reverse_related import OneToOneRel
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from flourish_export.admin_export_helper import AdminExportHelper
+from flourish_facet.models.child.mother_child_consent import MotherChildConsent
+from flourish_facet.models.mother.facet_consent import FacetConsent
 import xlwt
 from flourish_caregiver.helper_classes import MaternalStatusHelper
+from django.db.models import ManyToManyField, ForeignKey, OneToOneField, ManyToOneRel, FileField, ImageField
 
 
 class ExportActionMixin(AdminExportHelper):
@@ -37,49 +39,17 @@ class ExportActionMixin(AdminExportHelper):
         records = []
 
         for obj in queryset:
-            data = obj.__dict__.copy()
+            data = self.process_object_fields(obj)
 
             subject_identifier = getattr(obj, 'subject_identifier', None)
             screening_identifier = self.screening_identifier(
                 subject_identifier=subject_identifier)
-            caregiver_hiv_status = self.caregiver_hiv_status(
-                subject_identifier=subject_identifier)
-
-            # Add subject identifier and visit code
-            if getattr(obj, 'facet_visit', None):
-                data.update(
-                    subject_identifier=subject_identifier,
-                    visit_code=obj.visit_code)
 
             # Update variable names for study identifiers
             data = self.update_variables(data)
-            data.update(study_status=self.study_status(subject_identifier) or '')
-            data.update(hiv_status=caregiver_hiv_status,)
 
-            for field in self.get_model_fields:
-                field_name = field.name
-                if (field_name == 'consent_version') and self.is_visit(obj):
-                    data.update({f'{field_name}': '1'})
-                    continue
-                if isinstance(field, (ForeignKey, OneToOneField, OneToOneRel,)):
-                    continue
-                if isinstance(field, (FileField, ImageField,)):
-                    file_obj = getattr(obj, field_name, '')
-                    data.update({f'{field_name}': getattr(file_obj, 'name', '')})
-                    continue
-                if isinstance(field, ManyToManyField):
-                    data.update(self.m2m_data_dict(obj, field))
-                    continue
-                if not (self.is_consent(obj) or self.is_visit(obj)) and isinstance(field, ManyToOneRel):
-                    data.update(self.inline_data_dict(obj, field))
-                    continue
-
-            # Exclude identifying values
-            data = self.remove_exclude_fields(data)
-            # Correct date formats
-            data = self.fix_date_formats(data)
             records.append(data)
-        response = self.write_to_csv(records)
+        response = self.write_to_csv(records=records)
         return response
 
     export_as_csv.short_description = _(
@@ -113,11 +83,6 @@ class ExportActionMixin(AdminExportHelper):
             top_num += 1
             self.inline_header = True
 
-    def get_export_filename(self):
-        date_str = datetime.datetime.now().strftime('%Y-%m-%d')
-        filename = "%s-%s" % (self.model.__name__, date_str)
-        return filename
-
     def screening_identifier(self, subject_identifier=None):
         """Returns a screening identifier.
         """
@@ -150,6 +115,15 @@ class ExportActionMixin(AdminExportHelper):
     def is_visit(self, obj):
         visit_cls = django_apps.get_model('flourish_facet.facetvisit')
         return isinstance(obj, visit_cls)
+    
+    def is_excluded_model(self,model):
+        model_classes = [
+            django_apps.get_model('flourish_facet.facetvisit'),
+            django_apps.get_model('flourish_facet.appointment'),
+            django_apps.get_model('flourish_facet.facetcliniciannotes'),
+            django_apps.get_model('flourish_facet.cliniciannotesimage'),]
+        
+        return any(issubclass(model, cls) for cls in model_classes)
 
     @property
     def get_model_fields(self):
@@ -169,4 +143,74 @@ class ExportActionMixin(AdminExportHelper):
                 'screening_datetime_time', 'modified', 'form_as_json', 'consent_model',
                 'randomization_datetime', 'registration_datetime', 'is_verified_datetime',
                 'first_name', 'last_name', 'initials', 'identity', 'facet_visit_id',
-                'confirm_identity', 'motherchildconsent', ]
+                'confirm_identity', 'motherchildconsent', 'slug']
+
+    def process_object_fields(self, obj):
+        data = obj.__dict__.copy()
+
+        subject_identifier = getattr(obj, 'subject_identifier', None)
+        caregiver_hiv_status = self.caregiver_hiv_status(
+            subject_identifier=subject_identifier)
+
+        if getattr(obj, 'facet_visit', None):
+            data.update(subject_identifier=subject_identifier,
+                        visit_code=obj.visit_code)
+
+        for field in self.get_model_fields:
+
+            field_name = field.name
+            if (field_name == 'consent_version') and self.is_visit(obj):
+                data.update({f'{field_name}': '1'})
+                continue
+            if isinstance(field, (ForeignKey, OneToOneField, OneToOneRel)):
+                continue
+            if isinstance(field, (FileField, ImageField)):
+                file_obj = getattr(obj, field_name, '')
+                data.update({f'{field_name}': getattr(file_obj, 'name', '')})
+                continue
+            if isinstance(field, ManyToManyField):
+                data.update(self.m2m_data_dict(obj, field))
+                continue
+            if not (self.is_consent(obj) or self.is_visit(obj)) and isinstance(field, ManyToOneRel):
+                data.update(self.inline_data_dict(obj, field))
+                continue
+
+        data.update(study_status=self.study_status(
+            subject_identifier) or '')
+        data.update(hiv_status=caregiver_hiv_status,)
+        # Exclude identifying values
+        data = self.remove_exclude_fields(data)
+        # Correct date formats
+        data = self.fix_date_formats(data)
+
+        return data
+
+    def get_flat_model_data(self, model):
+        data = []
+        model_name = model.__name__.lower()
+        if self.is_excluded_model(model):
+            return data
+        # Temporarily set self.model to the current model
+        self.model = model
+        for obj in model.objects.all():
+            relation_identifier = {}
+            if isinstance(obj, MotherChildConsent):
+                facet_consent = getattr(obj, 'facet_consent', None)
+                mother_subject_identifier = getattr(facet_consent, 'subject_identifier', None)
+                relation_identifier = {"mother_identifier": mother_subject_identifier}
+            
+            elif isinstance(obj, FacetConsent):
+                mother_child_consent = obj.motherchildconsent_set.first()
+                child_subject_identifier = getattr(mother_child_consent, 'subject_identifier', None) if mother_child_consent else None
+                relation_identifier = {"child_identifier": child_subject_identifier}
+        
+            record = self.process_object_fields(obj)
+            prefixed_record = {
+                f"{model_name}_{key}": value for key, value in record.items()}
+            prefixed_record.update(relation_identifier)
+            data.append(prefixed_record)
+       
+            # Reset self.model after processing
+        self.model = None
+
+        return data

@@ -44,15 +44,16 @@ class Command(BaseCommand):
         df = df.rename(columns=custom_headers)
         df.to_csv('weekly_report.csv', index=False)
 
-
-        self.stdout.write(self.style.SUCCESS('Weekly report for pregnant participants generated successfully.'))
+        self.stdout.write(self.style.SUCCESS(
+            'Weekly report for pregnant participants generated successfully.'))
 
     # Confirm that the eligible participants is not consented for facet
     def confirm_no_facet_consent(self, result):
         ids = []
         for identifier in result:
             try:
-                FacetConsent.objects.get(subject_identifier=identifier.subject_identifier)
+                FacetConsent.objects.get(
+                    subject_identifier=identifier.subject_identifier)
             except FacetConsent.DoesNotExist:
                 ids.append(identifier.subject_identifier)
             else:
@@ -63,7 +64,8 @@ class Command(BaseCommand):
     def confirm_child_dob(self, consent_xids):
         flourish_child_consent_model = 'flourish_caregiver.caregiverchildconsent'
         child_birth_model = 'flourish_child.childbirth'
-        flourish_child_consent_cls = django_apps.get_model(flourish_child_consent_model)
+        flourish_child_consent_cls = django_apps.get_model(
+            flourish_child_consent_model)
         child_birth_cls = django_apps.get_model(child_birth_model)
         child_ids = []
 
@@ -71,7 +73,7 @@ class Command(BaseCommand):
             child_identifiers = flourish_child_consent_cls.objects.filter(
                 child_dob__isnull=True,
                 subject_consent__subject_identifier=obj
-                )
+            )
             for child in child_identifiers:
                 child_dob = getattr(child, 'child_dob', None)
                 if child_dob is None:
@@ -80,7 +82,7 @@ class Command(BaseCommand):
                     pass
 
         child_b_identifiers = child_birth_cls.objects.values_list(
-        'subject_identifier', flat=True)
+            'subject_identifier', flat=True)
 
         child_identifiers_set = set(child_b_identifiers)
         child_consent_subject_identifiers_set = set(child_ids)
@@ -92,12 +94,14 @@ class Command(BaseCommand):
         x_data = []
         for xid in xids:
             try:
-                ant = AntenatalEnrollment.objects.filter(subject_identifier=xid, current_hiv_status=NEG).latest('created')
+                ant = AntenatalEnrollment.objects.filter(
+                    subject_identifier=xid, current_hiv_status=NEG).latest('created')
             except AntenatalEnrollment.DoesNotExist:
                 pass
             else:
                 try:
-                    rfi = RelationshipFatherInvolvement.objects.filter(maternal_visit__subject_identifier=xid, partner_present='No').latest('created')
+                    rfi = RelationshipFatherInvolvement.objects.filter(
+                        maternal_visit__subject_identifier=xid, partner_present='No').latest('created')
                 except RelationshipFatherInvolvement.DoesNotExist:
                     pass
                 else:
