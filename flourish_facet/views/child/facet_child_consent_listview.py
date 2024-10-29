@@ -20,4 +20,3 @@ class FacetChildConsentListboardView(EdcBaseViewMixin, NavbarViewMixin,
     model_wrapper_cls = FacetChildConsentModelWrapper
     navbar_name = 'flourish_facet'
     navbar_selected_item = 'facet_child_listboard'
-

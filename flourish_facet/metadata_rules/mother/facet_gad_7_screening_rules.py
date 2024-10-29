@@ -3,6 +3,7 @@ from edc_metadata_rules import CrfRule, CrfRuleGroup, register, P
 
 app_label = 'flourish_facet'
 
+
 @register()
 class FacetGAD7AnxietyScreeningRuleGroup(CrfRuleGroup):
 

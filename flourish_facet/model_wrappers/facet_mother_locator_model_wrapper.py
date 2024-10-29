@@ -11,4 +11,3 @@ class LocatorModelWrapper(ModelWrapper):
     next_url_name = settings.DASHBOARD_URL_NAMES.get(
         'facet_flourish_consent_listboard_url')
     next_url_attrs = ['subject_identifier']
-

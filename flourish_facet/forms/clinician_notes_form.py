@@ -15,4 +15,3 @@ class FacetClinicianNotesImageForm(forms.ModelForm):
     class Meta:
         model = ClinicianNotesImage
         fields = '__all__'
-

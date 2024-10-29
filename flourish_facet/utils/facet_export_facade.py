@@ -16,5 +16,5 @@ class FacetExportFacade(ExportMethodsViewMixin):
     def add_email(self, email):
         self.emails.append(email)
 
-    def generate_export(self):
-        super().generate_export(self.app_label, self.emails)
+    def generate_export(self, description=None, flat_export=None):
+        super().generate_export(self.app_label, self.emails, flat_export, description)

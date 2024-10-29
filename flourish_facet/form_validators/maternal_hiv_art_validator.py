@@ -20,8 +20,6 @@ class MaternalHivArtFormValidator(FormValidator):
         self.validate_against_hiv_test_date()
 
     def hiv_positive_validations(self):
-    
-
 
         self.required_if(
             YES,
@@ -88,13 +86,13 @@ class MaternalHivArtFormValidator(FormValidator):
 
         self.required_if(NO, field='hiv_status_disclosure',
                          field_required='comment_end')
-        
+
     def validate_against_hiv_test_date(self):
         cleaned_data = self.cleaned_data
         hiv_test_date = cleaned_data.get('hiv_test_date')
         art_start_date = cleaned_data.get('art_start_date')
         if (art_start_date and art_start_date < hiv_test_date):
-            msg ={'art_start_date':
-                       'Date cannot be before date tested positive '
-                       f' {hiv_test_date}'}
+            msg = {'art_start_date':
+                   'Date cannot be before date tested positive '
+                   f' {hiv_test_date}'}
             raise ValidationError(msg)
