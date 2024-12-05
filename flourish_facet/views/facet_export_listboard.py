@@ -1,12 +1,4 @@
-import datetime
-import re
-import threading
-import time
-
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-from django.db.models.constants import LOOKUP_SEP
 from django.utils.decorators import method_decorator
 
 from edc_base.view_mixins import EdcBaseViewMixin
@@ -15,14 +7,14 @@ from edc_dashboard.views import ListboardView
 from edc_navbar import NavbarViewMixin
 
 from flourish_export.identifiers import ExportIdentifier
-from flourish_export.models import ExportFile
 from flourish_export.views.listboard_view_mixin import ListBoardViewMixin
 from ..model_wrappers import FacetExportFileModelWrapper
 from ..utils import FacetExportFacade
 
 
-class FacetExportListBoardView(NavbarViewMixin, EdcBaseViewMixin, ListBoardViewMixin,
-                               ListboardFilterViewMixin, SearchFormViewMixin, ListboardView):
+class FacetExportListBoardView(NavbarViewMixin, EdcBaseViewMixin,
+                               ListBoardViewMixin, ListboardFilterViewMixin,
+                               SearchFormViewMixin, ListboardView):
 
     listboard_template = 'facet_export_listboard_template'
     listboard_url = 'facet_export_listboard_url'
@@ -57,4 +49,6 @@ class FacetExportListBoardView(NavbarViewMixin, EdcBaseViewMixin, ListBoardViewM
         return context
 
     def get_queryset(self):
-        return super().get_queryset().filter(study='flourish_facet', description='Flourish Facet Export(s)')
+        return super().get_queryset().filter(
+            study='flourish_facet',
+            description='Flourish Facet Export(s)')
